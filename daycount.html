@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<!-- saved from url=(0048)https://www.weloan.com/front/account/home?code=0 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>日历插件</title>
+    <style>
+        .day_container{max-width: 900px;   }
+        h2{    font-size: 22px;
+            font-weight: normal;
+            color: #333;}
+    </style>
+</head>
+
+<!--日历所需css文件 start-->
+<link href="./css/fullcalendar.min.css" rel="stylesheet">
+<link href="./css/fullcalendar.print.min.css" rel="stylesheet" media="print">
+<!--日历所需css文件 end-->
+
+<!--日历所需js文件 start-->
+<!--<script type="text/javascript" src="./js/moment.min.js"></script>-->
+<!--<script type="text/javascript" src="./js/jquery.min.js"></script>-->
+<!--<script type="text/javascript" src="./js/fullcalendar.min.js"></script>-->
+<!--日历所需js文件 end-->
+
+
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.21.0/moment.js"></script>
+<script src="https://cdn.bootcss.com/fullcalendar/3.9.0/fullcalendar.js"></script>
+
+<div class="day_container">
+    <div id="center-content">
+        <div class="m-center-content-r">
+            <div class="userTime">
+                <div class="calenderBox">
+                    <div id="calendar" class="fc fc-unthemed fc-ltr">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function getdaytime(value){
+//        debugger
+        function add0(m) {
+            return m < 10 ? '0' + m : m
+        }
+        if(value==null || value==''){
+            var time = new Date();
+        }
+        else{
+            var time = new Date(value);
+        }
+
+        var y = time.getFullYear();
+        var m = time.getMonth();
+        return time= y + '-' + add0(m) + '-' + '01';
+
+        return time
+    }
+
+    /* 日历 start*/
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: ''/*,basicWeek,basicDay*/
+        },
+        startParam:"start",
+        endParam:"end",
+        timezoneParam : "timezone",
+//        defaultDate:'2018-1-01',
+        events: function (start, end, timezone, callback) {
+
+//            var timedate=getdaytime(start.unix()*1000);
+//            var timedate=getdaytime(start.unix()*1000);
+            console.log(start.toISOString());
+            console.log(end.toISOString()+"----------");
+            var parm={
+                beginTime:start.toISOString(),
+                token:"ab5cf5352fcae191df5ee317380f6312"
+            }
+            $.ajax({
+                type: "post",
+                url: 'http://bankceshi.weloan.com/xwjrfront/invest/getDealRecordPc'+"?",
+                data: $.param(parm),
+                dataType: 'json',
+                success: function (data) {
+                    var demoEvents = [];
+                    for (var i = 0; i < data.data.eealRecordList.length; i++) {
+                        var obj1 = {
+                            title: "现金：" + data.data.eealRecordList[i].receiveCorpus + "元",
+                            start: data.data.eealRecordList[i].receiveTime
+                        };
+                        var obj2 = {
+                            title: "黄金：" + data.data.eealRecordList[i].receiveInterest + "克",
+                            start: data.data.eealRecordList[i].receiveTime
+                        };
+                        demoEvents.push(obj1);
+                        demoEvents.push(obj2);
+                    }
+                    callback(demoEvents);
+                }
+            });
+        },
+        navLinks: true, // can click day/week names to navigate views
+        editable: false,
+        eventLimit: true, // allow "more" link when too many events
+        buttonText: {
+            today: '今天',
+            month: '月视图',
+            week: '周视图',
+            day: '日视图'
+        },
+        timezone:'local',
+        dayNames: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+        dayNamesShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+        titleFormat: "YYYY年MM月DD日",
+
+//        eventSources: [
+//            // your event source
+//            {
+//                url: '',
+//                type: 'POST',
+//                data: {
+//                    custom_param1: 'something',
+//                    custom_param2: 'somethingelse'
+//                },
+//                error: function () {
+//                    alert('there was an error while fetching events!');
+//                },
+//                color: 'yellow',   // a non-ajax option
+//                textColor: 'black' // a non-ajax option
+//            }
+//        ]
+    });
+
+    /*日历 end*/
+</script>
+
+
+</body>
+</html>
